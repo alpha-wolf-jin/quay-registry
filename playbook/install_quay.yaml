@@ -1,0 +1,34 @@
+---
+- hosts: localhost
+  connection: local
+  become: true
+  gather_facts: false
+
+#  vars_prompt:
+#
+#    - name: registry_pwd
+#      prompt: What is your password for registry.redhat.io?
+
+  tasks:
+
+  - name: mirroring-operator
+    include_role:
+      name: install_quay
+    vars:
+      operator_list:
+      - quay-operator
+      registry_user: jinzha1@redhat.com
+      new_operator_index: quay-operator-index
+      mirror_home: /opt/registry/mirror-quay
+      mirroring_operator_images: true
+      uploading_operator_images: true
+      prepare_cmds: false
+
+
+
+      #operator_list:
+      #- local-storage-operator
+      #- mcg-operator
+      #- ocs-operator
+      #- odf-csi-addons-operator
+      #- odf-operator
