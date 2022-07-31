@@ -18,6 +18,7 @@
       operator_list:
       - quay-operator
       registry_user: jinzha1@redhat.com
+      soure_operator_index: redhat-operator-index
       new_operator_index: quay-operator-index
       mirror_home: /opt/registry/mirror-quay
       mirroring_operator_images: true

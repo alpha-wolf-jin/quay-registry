@@ -105,6 +105,7 @@
     podman login --authfile="{{ reg_creds }}"  "{{ dest_registry }}:{{ dest_registry_port }}"
     podman login -u {{ registry_user }} -p {{ registry_pwd }}   registry.redhat.io
     opm index prune -f "registry.redhat.io/redhat/{{ soure_operator_index }}:{{ ocp_version }}" -p {{ operator_list | join(',') }} -t "{{ dest_registry }}:{{ dest_registry_port }}/olm-mirror/{{ new_operator_index }}:{{ ocp_version }}"
+    podman save -o {{ new_operator_index }}.tar "{{ dest_registry }}:{{ dest_registry_port }}/olm-mirror/{{ new_operator_index }}:{{ ocp_version }}"
   args:
     chdir: "{{ mirror_home }}"
 
