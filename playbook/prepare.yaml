@@ -4,11 +4,6 @@
   become: true
   gather_facts: false
 
-  vars_prompt:
-
-    - name: registry_pwd
-      prompt: What is your password for registry.redhat.io?
-
   tasks:
 
   - name: 01 install ansible collection
@@ -16,20 +11,7 @@
       ansible-galaxy collection install community.general
       ansible-galaxy collection install ansible.posix
       ansible-galaxy collection install containers.podman
-  
-  - name: get full operator list
-    include_role:
-      name: operator-list
-    vars:
-      soure_operator_index: redhat-operator-index
-      registry_user: jinzha1@redhat.com
-      disk_dev: /dev/sda
+      ansible-galaxy collection list
+      export collections_paths=$(ansible-galaxy collection list | grep "^#" | sed -e "s/^#\s*//g")
 
 
-
-      #operator_list:
-      #- local-storage-operator
-      #- mcg-operator
-      #- ocs-operator
-      #- odf-csi-addons-operator
-      #- odf-operator
