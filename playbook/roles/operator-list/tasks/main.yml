@@ -88,10 +88,15 @@
     mode: '0644'
 
 
+- name: "Pull image {{ official_indexes }}:{{ ocp_version }}"
+  ansible.builtin.shell: |
+    podman login -u {{ registry_user }} -p {{ registry_pwd }} registry.redhat.io
+    podman pull registry.redhat.io/redhat/{{ soure_operator_index }}:{{ ocp_version }} 
+
 - name: "Run container {{ official_indexes }}:{{ ocp_version }}"
   ansible.builtin.shell: |
     podman login -u {{ registry_user }} -p {{ registry_pwd }} registry.redhat.io
-    podman run -p50051:50051 -it registry.redhat.io/redhat/{{ official_indexes }}:{{ ocp_version }} 
+    podman run -p50051:50051 -it registry.redhat.io/redhat/{{ soure_operator_index }}:{{ ocp_version }} 
   async: 10
   poll: 0
 
@@ -102,11 +107,10 @@
     host: 127.0.0.1
     connect_timeout: 3
     delay: 3
-    timeout: 30
+    timeout: 300
 
 - name: Retrieve Operator List 
   ansible.builtin.shell: |
-    ss -nutlp
-    grpcurl -plaintext localhost:50051 api.Registry/ListPackages  >{{ base_home }}/tmp/operator_list.txt
+    grpcurl -plaintext localhost:50051 api.Registry/ListPackages  >{{ base_home }}/tmp/{{ soure_operator_index }}_operator_list.txt
   register: result
 
