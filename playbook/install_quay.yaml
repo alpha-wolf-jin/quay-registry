@@ -15,15 +15,16 @@
     include_role:
       name: install_quay
     vars:
-      operator_list:
-      - quay-operator
-      registry_user: jinzha1@redhat.com
-      new_operator_index: quay-operator-index
-      mirror_home: /opt/registry/mirror-quay
-      mirroring_operator_images: true
-      uploading_operator_images: true
-      prepare_cmds: false
-
+      dest_registry: quay01.example.opentlc.com
+      #      operator_list:
+      #      - quay-operator
+      #      registry_user: jinzha1@redhat.com
+      #      new_operator_index: quay-operator-index
+      #      mirror_home: /opt/registry/mirror-quay
+      #      mirroring_operator_images: true
+      #      uploading_operator_images: true
+      #      prepare_cmds: false
+      #
 
 
       #operator_list:

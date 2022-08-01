@@ -99,28 +99,65 @@
     name: "{{ dest_registry }}:{{ dest_registry_port }}/olm-mirror/{{ new_operator_index }}:{{ ocp_version }}"
     state: absent
 
-
-- name: Trailor Operator index
+- name: Trailor Operator index 01 - login
   ansible.builtin.shell: |
-    podman login --authfile="{{ reg_creds }}"  "{{ dest_registry }}:{{ dest_registry_port }}"
     podman login -u {{ registry_user }} -p {{ registry_pwd }}   registry.redhat.io
+  args:
+    chdir: "{{ mirror_home }}"
+  register: result
+  until: 
+    - result.rc == 0
+  retries: 3
+  delay: 15
+ 
+ 
+- debug: var=result
+
+- name: Trailor Operator index 02 - prunn
+  ansible.builtin.shell: |
     opm index prune -f "registry.redhat.io/redhat/{{ soure_operator_index }}:{{ ocp_version }}" -p {{ operator_list | join(',') }} -t "{{ dest_registry }}:{{ dest_registry_port }}/olm-mirror/{{ new_operator_index }}:{{ ocp_version }}"
+  args:
+    chdir: "{{ mirror_home }}"
+  register: result
+  until: 
+    - result.rc == 0
+  retries: 3
+  delay: 15
+ 
+ 
+- debug: var=result
+
+
+- name: Trailor Operator index 03 - save
+  ansible.builtin.shell: |
+    rm -f {{ new_operator_index }}.tar
     podman save -o {{ new_operator_index }}.tar "{{ dest_registry }}:{{ dest_registry_port }}/olm-mirror/{{ new_operator_index }}:{{ ocp_version }}"
   args:
     chdir: "{{ mirror_home }}"
+  register: result
+  until: 
+    - result.rc == 0
+  retries: 3
+  delay: 15
+ 
+- debug: var=result
 
 - name: Build and push an image to multiple registries with separate parameters
   containers.podman.podman_image:
-    name: "{{ item.name }}"
-    tag: "{{ item.tag }}"
+    name: "{{ new_operator_index }}"
+    tag: "{{ ocp_version }}"
     push: yes
     auth_file: "{{ reg_creds }}"
     push_args:
-      dest: "{{ item.dest }}"
-  loop:
-  - name: "{{ new_operator_index }}"
-    tag: "{{ ocp_version }}"
-    dest: "{{ dest_registry }}:{{ dest_registry_port }}/olm-mirror/"
+      dest: "{{ dest_registry }}:{{ dest_registry_port }}/olm-mirror/"
+  register: result
+  until: 
+    - result.changed
+    - not result.failed
+  retries: 3
+  delay: 15
+
+- debug: var=result
 
 - name: Tail Operator index
   ansible.builtin.shell: |
@@ -128,6 +165,11 @@
   args:
     chdir: "{{ mirror_home }}"
   register: result
+  until: 
+    - result.rc == 0
+  retries: 3
+  delay: 15
+ 
 
 - debug: var=result
 
@@ -171,6 +213,11 @@
     args:
       chdir: "{{ mirror_home }}"
     register: result
+    until: 
+      - result.rc == 0
+    retries: 3
+    delay: 15
+ 
   
   - debug: var=result
 
