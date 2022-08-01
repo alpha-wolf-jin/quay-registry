@@ -7,13 +7,13 @@
 #    ansible-galaxy collection install ansible.posix
 #    ansible-galaxy collection install containers.podman
 #
-#- name: install RPM
-#  ansible.builtin.yum:
-#    name: "{{ item }}"
-#    state: latest
-#  loop:
-#  - podman
-#  - openssl
+- name: install RPM
+  ansible.builtin.yum:
+    name: "{{ item }}"
+    state: latest
+  loop:
+  - podman
+  - openssl
 
 - name: Create a volume group for Quay
   community.general.lvg:
@@ -88,7 +88,7 @@
     mode: '0644'
 
 
-- name: Update CA & Create Auth file for Quay
+- name: "Run container {{ official_indexes }}:{{ ocp_version }}"
   ansible.builtin.shell: |
     podman login -u {{ registry_user }} -p {{ registry_pwd }} registry.redhat.io
     podman run -p50051:50051 -it registry.redhat.io/redhat/{{ official_indexes }}:{{ ocp_version }} 
@@ -96,8 +96,17 @@
   poll: 0
 
 
-- name: Update CA & Create Auth file for Quay
+- name: Wait for service to be ready
+  wait_for:
+    port: 50051
+    host: 127.0.0.1
+    connect_timeout: 3
+    delay: 3
+    timeout: 30
+
+- name: Retrieve Operator List 
   ansible.builtin.shell: |
+    ss -nutlp
     grpcurl -plaintext localhost:50051 api.Registry/ListPackages  >{{ base_home }}/tmp/operator_list.txt
   register: result
 

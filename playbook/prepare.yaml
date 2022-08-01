@@ -11,6 +11,12 @@
 
   tasks:
 
+  - name: 01 install ansible collection
+    ansible.builtin.shell: |
+      ansible-galaxy collection install community.general
+      ansible-galaxy collection install ansible.posix
+      ansible-galaxy collection install containers.podman
+  
   - name: get full operator list
     include_role:
       name: operator-list
