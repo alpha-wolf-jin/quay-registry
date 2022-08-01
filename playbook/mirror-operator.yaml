@@ -17,11 +17,16 @@
     vars:
       operator_list:
       - quay-operator
+      - local-storage-operator
+      - mcg-operator
+      - ocs-operator
+      - odf-csi-addons-operator
+      - odf-operator
       registry_user: jinzha1@redhat.com
       dest_registry: quay01.example.opentlc.com
       soure_operator_index: redhat-operator-index
-      new_operator_index: quay-operator-index
-      mirror_home: /opt/registry/mirror-quay-operator
+      new_operator_index: storage-operator-index
+      mirror_home: /opt/registry/mirror-storage-operator
       mirroring_operator_images: true
       uploading_operator_images: true
       prepare_cmds: false
